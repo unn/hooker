@@ -1,0 +1,27 @@
+#!/usr/bin/php
+<?php
+/**
+ * .git/hooks/pre-commit
+ * 
+ * This pre-commit hook will lint PHP files
+ */
+exec('git diff --cached --name-status --diff-filter=ACM', $output);
+
+$status = 0;
+
+foreach ($output as $file) {
+
+  $file_name = trim(substr($file, 1) );
+
+  if (pathinfo($file_name, PATHINFO_EXTENSION) == "php") {
+    $lint = array();
+    exec("php -l " . escapeshellarg($file_name), $lint, $return);
+
+    if ($return) {
+      $status = 1;
+      echo implode("\n", $lint), "\n"; 
+    }
+  }
+}
+
+exit($status);

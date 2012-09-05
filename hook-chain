@@ -1,0 +1,20 @@
+#!/bin/bash -e
+
+hookname=`basename $0`
+
+FILE=`mktemp -t ${hookname}` || exit 1
+trap 'rm -f $FILE' EXIT
+cat - > $FILE
+
+# Mungy path so I can run this outside of git
+for hook in $GIT_DIR/hooks/bin/$hookname.*
+do
+  if test -x "$hook"; then
+    cat $FILE | $hook "$@"
+    status=$?
+    if test $status -ne 0; then
+      echo Hook $hook failed with error code $status
+      exit $status
+    fi
+  fi
+done
