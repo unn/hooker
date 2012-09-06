@@ -3,13 +3,13 @@
 /**
  * .git/hooks/pre-commit
  *
- * This pre-commit hook will lint PHP files.
+ * This pre-commit hook will drush dcs Drupal files.
  */
 exec('git diff --cached --name-status --diff-filter=ACM', $output);
 
 $status = 0;
 
-print "PHP lint linting\n";
+print "PHP_CodeSniffer sniffing\n";
 
 foreach ($output as $file) {
 
@@ -17,22 +17,23 @@ foreach ($output as $file) {
   $ext = pathinfo($file_name, PATHINFO_EXTENSION);
 
   /**
-  * Hopefully, this is every Drupal extension.
+  * Hopefully, this is every Drupal extension. The Drupal code sniff seems to
+  * run itself against every file, which seems unnecessary.
   */
   if ($ext == "php" || $ext == "module" || $ext == "install" || $ext == "test"
       || $ext == "inc" || $ext == "profile" || $ext == "view") {
-    $lint = array();
-    exec("php -l " . escapeshellarg($file_name), $lint, $return);
+    $sniff = array();
+    exec("drush dcs " . escapeshellarg($file_name), $sniff, $return);
 
     if ($return) {
       $status = 1;
-      print implode("\n", $lint) . "\n";
+      print implode("\n", $sniff) . "\n";
     }
   }
   else {
-    print "PHP lint is skipping " . $file_name . ".\n";
+    print "PHP_CodeSniffer is skipping " . $file_name . ".\n";
   }
 }
 
-print "PHP lint complete\n";
+print "PHP_CodeSniffer complete\n";
 exit($status);
