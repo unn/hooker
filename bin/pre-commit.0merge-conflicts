@@ -1,0 +1,23 @@
+#!/bin/bash
+# Author: Remigijus Jarmalavičius <remigijus@jarmalavicius.lt>
+# Author: Vytautas Povilaitis <php-checker@vytux.lt>
+# Author: Kornel Lugosi <coornail@gmail.com>
+
+LIST=$(git diff-index --cached --name-status HEAD | grep  -E "^(A|C|M|R)" | awk {'print $2'})
+ERRORS_BUFFER=""
+for file in $LIST
+do
+  # Check for conflict markers
+  ERRORS=$(grep -E '>>[>*]>>|<<[<*]<<' $file | grep -v 'Binary')
+  if [ "$ERRORS" != "" ]; then
+    ERRORS_BUFFER="$ERRORS_BUFFER- Conflict marker found in file $file\n"
+    ERRORS=""
+  fi
+done
+
+# Print errors
+if [ "$ERRORS_BUFFER" != "" ]; then
+    echo "Errors found in index:"
+    echo -e $ERRORS_BUFFER
+    exit 1
+fi
