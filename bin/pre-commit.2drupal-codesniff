@@ -21,7 +21,7 @@ foreach ($output as $file) {
   * run itself against every file, which seems unnecessary.
   */
   if ($ext == "php" || $ext == "module" || $ext == "install" || $ext == "test"
-      || $ext == "inc" || $ext == "profile" || $ext == "view") {
+      || $ext == "inc" || $ext == "profile" || $ext == "view" || $ext == "css") {
     $sniff = array();
     exec("drush dcs " . escapeshellarg($file_name), $sniff, $return);
 
